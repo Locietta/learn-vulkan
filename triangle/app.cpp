@@ -506,8 +506,8 @@ void App::initVulkan() {
 }
 
 void App::createGraphicsPipeline() {
-    const auto vertex_shader_code = readFile("triangle/shader/triangle.vs.spv");
-    const auto pixel_shader_code = readFile("triangle/shader/triangle.ps.spv");
+    const auto vertex_shader_code = readFile("triangle.vert.spv");
+    const auto pixel_shader_code = readFile("triangle.frag.spv");
 
     VkShaderModule vertex_shader_module = createShaderModule(device_, vertex_shader_code);
     VkShaderModule pixel_shader_module = createShaderModule(device_, pixel_shader_code);
@@ -516,14 +516,14 @@ void App::createGraphicsPipeline() {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
         .stage = VK_SHADER_STAGE_VERTEX_BIT,
         .module = vertex_shader_module,
-        .pName = "VSMain", // should be consistent with entry point in shader
+        .pName = "main", // should be consistent with entry point in shader
     };
 
     const VkPipelineShaderStageCreateInfo pixel_shader_stage_create_info{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
         .stage = VK_SHADER_STAGE_FRAGMENT_BIT,
         .module = pixel_shader_module,
-        .pName = "PSMain",
+        .pName = "main",
     };
 
     const std::array shader_stages = {vertex_shader_stage_create_info, pixel_shader_stage_create_info};
