@@ -506,23 +506,28 @@ void App::initVulkan() {
 }
 
 void App::createGraphicsPipeline() {
-    const auto vertex_shader_code = readFile("triangle.vert.spv");
-    const auto pixel_shader_code = readFile("triangle.frag.spv");
+    constexpr static uint8_t VS_CODE[] = {
+#include "triangle.vs.spv.h"
+    };
 
-    VkShaderModule vertex_shader_module = createShaderModule(device_, vertex_shader_code);
-    VkShaderModule pixel_shader_module = createShaderModule(device_, pixel_shader_code);
+    constexpr static uint8_t PS_CODE[] = {
+#include "triangle.ps.spv.h"
+    };
+
+    VkShaderModule vs_module = createShaderModule(device_, std::as_bytes(std::span(VS_CODE)));
+    VkShaderModule ps_module = createShaderModule(device_, std::as_bytes(std::span(PS_CODE)));
 
     const VkPipelineShaderStageCreateInfo vertex_shader_stage_create_info{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
         .stage = VK_SHADER_STAGE_VERTEX_BIT,
-        .module = vertex_shader_module,
+        .module = vs_module,
         .pName = "main", // should be consistent with entry point in shader
     };
 
     const VkPipelineShaderStageCreateInfo pixel_shader_stage_create_info{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
         .stage = VK_SHADER_STAGE_FRAGMENT_BIT,
-        .module = pixel_shader_module,
+        .module = ps_module,
         .pName = "main",
     };
 
@@ -639,8 +644,8 @@ void App::createGraphicsPipeline() {
         throw std::runtime_error("failed to create graphics pipeline!");
     }
 
-    vkDestroyShaderModule(device_, vertex_shader_module, nullptr);
-    vkDestroyShaderModule(device_, pixel_shader_module, nullptr);
+    vkDestroyShaderModule(device_, vs_module, nullptr);
+    vkDestroyShaderModule(device_, ps_module, nullptr);
 }
 
 void App::createRenderPass() {

@@ -1,6 +1,6 @@
-add_rules("hlsl2spv")
 
 target("triangle")
     set_kind("binary")
-    add_files("*.cpp", "shader/*.vert", "shader/*.frag")
+    add_rules("hlsl2spv", { bin2c = true })
+    add_files("*.cpp", "shader/*.hlsl")
     add_packages("glfw", "vulkansdk", "glm", "fmt")
