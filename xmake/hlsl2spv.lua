@@ -25,7 +25,8 @@ rule("hlsl2spv")
         assert(shadertype ~= "", "shader type not specified!")
 
         local targetenv = target:extraconf("rules", "hlsl2spv", "targetenv") or "vulkan1.0"
-        local outputdir = target:extraconf("rules", "hlsl2spv", "outputdir") or target:targetdir()
+        local outputdir = target:extraconf("rules", "hlsl2spv", "outputdir") or path.join(target:targetdir(), "shader")
+        local hlslversion = target:extraconf("rules", "hlsl2spv", "hlslversion") or "2018"
         local spvfilepath = path.join(outputdir, basename_with_type .. ".spv")
         
         local shadermodel = target:extraconf("rules", "hlsl2spv", "shadermodel") or "6.0"
@@ -36,7 +37,7 @@ rule("hlsl2spv")
         batchcmds:show_progress(opt.progress, "${color.build.object}compiling.hlsl %s", sourcefile_hlsl)
         batchcmds:mkdir(outputdir)
 
-        batchcmds:vrunv(dxc.program, {path(sourcefile_hlsl), "-spirv", "-fspv-target-env=" .. targetenv, "-E", "main", "-T", dxc_profile, "-Fo", path(spvfilepath)})
+        batchcmds:vrunv(dxc.program, {path(sourcefile_hlsl), "-spirv", "-HV", hlslversion, "-fspv-target-env=" .. targetenv, "-E", "main", "-T", dxc_profile, "-Fo", path(spvfilepath)})
 
         -- bin2c
         local outputfile = spvfilepath
@@ -44,7 +45,7 @@ rule("hlsl2spv")
 
         if is_bin2c then 
             -- get header file
-            local headerdir = outputdir
+            local headerdir = path.join(target:autogendir(), "rules", "hlsl2spv")
             local headerfile = path.join(headerdir, path.filename(spvfilepath) .. ".h")
 
             target:add("includedirs", headerdir)
@@ -63,7 +64,7 @@ rule("hlsl2spv")
     after_clean(function (target, batchcmds, sourcefile_hlsl) 
         import("private.action.clean.remove_files")
 
-        local outputdir = target:extraconf("rules", "hlsl2spv", "outputdir") or target:targetdir()
+        local outputdir = target:extraconf("rules", "hlsl2spv", "outputdir") or path.join(target:targetdir(), "shader")
         remove_files(path.join(outputdir, "*.spv"))
         remove_files(path.join(outputdir, "*.spv.h"))
     end)
