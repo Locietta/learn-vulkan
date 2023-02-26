@@ -18,14 +18,13 @@ rule("hlsl2spv")
         assert(dxc, "dxc not found!")
 
         -- hlsl to spv
-        local extension = path.extension(sourcefile_hlsl)
         local basename_with_type = path.basename(sourcefile_hlsl)
         local shadertype = string.sub(path.extension(basename_with_type), 2, -1)
 
         assert(shadertype ~= "", "shader type not specified!")
 
         local targetenv = target:extraconf("rules", "hlsl2spv", "targetenv") or "vulkan1.0"
-        local outputdir = target:extraconf("rules", "hlsl2spv", "outputdir") or path.join(target:targetdir(), "shader")
+        local outputdir = target:extraconf("rules", "hlsl2spv", "outputdir") or path.join(target:autogendir(), "rules", "hlsl2spv")
         local hlslversion = target:extraconf("rules", "hlsl2spv", "hlslversion") or "2018"
         local spvfilepath = path.join(outputdir, basename_with_type .. ".spv")
         
@@ -45,7 +44,7 @@ rule("hlsl2spv")
 
         if is_bin2c then 
             -- get header file
-            local headerdir = path.join(target:autogendir(), "rules", "hlsl2spv")
+            local headerdir = outputdir
             local headerfile = path.join(headerdir, path.filename(spvfilepath) .. ".h")
 
             target:add("includedirs", headerdir)
