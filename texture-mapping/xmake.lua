@@ -1,0 +1,11 @@
+add_requires("stb")
+add_defines("STB_IMAGE_IMPLEMENTATION")
+
+target("texture-mapping")
+    set_kind("binary")
+    add_rules("hlsl2spv", { bin2c = true })
+    add_files("*.cpp", "shader/*.hlsl")
+    add_packages("glfw", "vulkansdk", "glm", "fmt", "stb")
+    after_build(function (target)
+        os.cp("$(scriptdir)/texture", "$(buildir)/$(os)/$(arch)/$(mode)")
+    end)
