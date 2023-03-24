@@ -21,7 +21,11 @@ rule("hlsl2spv")
         local basename_with_type = path.basename(sourcefile_hlsl)
         local shadertype = string.sub(path.extension(basename_with_type), 2, -1)
 
-        assert(shadertype ~= "", "shader type not specified!")
+        if shadertype == "" then 
+            -- if not specify shader type, considered it a header, skip
+            print("[WARN] hlsl2spv: shader type not specified, skip %s", sourcefile_hlsl)
+            return
+        end
 
         local targetenv = target:extraconf("rules", "hlsl2spv", "targetenv") or "vulkan1.0"
         local outputdir = target:extraconf("rules", "hlsl2spv", "outputdir") or path.join(target:autogendir(), "rules", "hlsl2spv")
